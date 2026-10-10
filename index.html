@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalcuPro - Sistema Profesional de Precios y Costos</title>
+  
+  <!-- GOOGLE FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- ESTILOS CSS - INTRO ESTILO VIDEOJUEGO Y DISEÑO CALCUPRO -->
+  <style>
+    :root {
+      --bg-main: #030712;
+      --card-bg: rgba(11, 19, 38, 0.88);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(245, 158, 11, 0.3);
+      --border-focus: #f59e0b;
+      --accent-color: #f59e0b;
+      --accent-hover: #d97706;
+      --input-bg: rgba(5, 10, 20, 0.95);
+      --success-color: #34d399;
+      --danger-color: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* PANTALLA DE CARGA / INTRO ESTILO VIDEOJUEGO */
+    #intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.25) 0%, transparent 50%);
+      animation: fadeOutIntro 0.8s ease 2.5s forwards;
+      pointer-events: none;
+    }
+
+    .intro-logo-box {
+      text-align: center;
+      animation: pulseLogo 1.5s infinite alternate;
+    }
+
+    .intro-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #fde68a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .intro-subtitle {
+      color: #93c5fd;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+    }
+
+    .loading-bar-container {
+      width: 280px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .loading-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #3b82f6, #34d399);
+      animation: fillBar 2s ease forwards;
+    }
+
+    @keyframes fillBar {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes pulseLogo {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      100% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 20px rgba(245,158,11,0.5)); }
+    }
+
+    @keyframes fadeOutIntro {
+      0% { opacity: 1; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(245, 158, 11, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(29, 78, 216, 0.2) 0%, transparent 70%),
+        linear-gradient(135deg, #020617 0%, #090d1f 50%, #020617 100%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1150px;
+      width: 100%;
+    }
+
+    /* CABECERA Y LOGOTIPO CORPORATIVO PROFESIONAL */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-logo-wrapper {
+      position: relative;
+      padding: 3px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #fbbf24, #1d4ed8, #f59e0b);
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.55), 0 0 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .app-logo {
+      width: 76px;
+      height: 76px;
+      border-radius: 20px;
+      background: #090d1f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      width: 36px;
+      height: 36px;
+      transform: rotate(45deg);
+    }
+
+    .logo-block {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.7);
+    }
+
+    .logo-block:nth-child(2) {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .logo-block:nth-child(3) {
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+    }
+
+    .logo-block:nth-child(4) {
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+    }
+
+    header h1 {
+      color: #ffffff;
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 0%, #fde68a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(245, 158, 11, 0.35);
+    }
+
+    .subtitle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      padding: 6px 18px;
+      border-radius: 30px;
+      color: #fde68a;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    @media (min-width: 900px) {
+      .calculator-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* TARJETAS CON EFECTO VIDRIO Y BORDES REALZADOS */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.8), 0 0 30px rgba(245, 158, 11, 0.1);
+      backdrop-filter: blur(16px);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: 0 30px 60px -12px rgba(2, 6, 23, 0.9), 0 0 40px rgba(245, 158, 11, 0.2);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(245, 158, 11, 0.25);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      outline: none;
+      background-color: var(--input-bg);
+      color: #ffffff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-group input::placeholder {
+      color: #475569;
+    }
+
+    .input-group input:hover {
+      border-color: rgba(245, 158, 11, 0.6);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+    }
+
+    .input-group input:focus {
+      border-color: var(--border-focus);
+      background-color: #030712;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3), 0 0 25px rgba(245, 158, 11, 0.4);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #030712;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(245, 158, 11, 0.65);
+    }
+
+    .btn-secondary {
+      background: rgba(37, 99, 235, 0.2);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(37, 99, 235, 0.35);
+      border-color: rgba(59, 130, 246, 0.8);
+    }
+
+    .result-box.primary {
+      background: linear-gradient(135deg, #78350f 0%, #1e3a8a 100%);
+      border: 1px solid rgba(245, 158, 11, 0.7);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 35px -5px rgba(30, 58, 138, 0.7), 0 0 25px rgba(245, 158, 11, 0.25);
+    }
+
+    .result-box.primary span {
+      font-size: 0.75rem;
+      color: #fde68a;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .result-box.primary h3 {
+      font-size: 2.5rem;
+      color: #ffffff;
+      margin-top: 8px;
+      font-weight: 800;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .result-item {
+      background-color: var(--input-bg);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-item span {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .result-item strong {
+      font-size: 1.15rem;
+      color: #ffffff;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .text-success {
+      color: var(--success-color) !important;
+    }
+
+    /* SECCIÓN DE HISTORIAL - ESTILO EXCEL DE LUJO */
+    .history-section {
+      grid-column: 1 / -1;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      border: 1px solid var(--border-color);
+      margin-top: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.8), 0 0 30px rgba(245, 158, 11, 0.1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      background: rgba(5, 10, 20, 0.6);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border-bottom: 2px solid rgba(245, 158, 11, 0.4);
+    }
+
+    th {
+      padding: 16px;
+      color: #fde68a;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    th:last-child {
+      border-right: none;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.015);
+    }
+
+    tbody tr:hover {
+      background-color: rgba(245, 158, 11, 0.07);
+    }
+
+    td {
+      padding: 16px;
+      color: #f8fafc;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      font-weight: 500;
+    }
+
+    td:last-child {
+      border-right: none;
+    }
+
+    .btn-action {
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--danger-color);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: rgba(248, 113, 113, 0.25);
+    }
+
+    .btn-print {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--success-color);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background: rgba(52, 211, 153, 0.25);
+    }
+
+    .btn-download {
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      background: rgba(59, 130, 246, 0.25);
+    }
+
+    /* ESTILO DE COMPROBANTE PERFECTAMENTE AJUSTADO A UNA SOLA PÁGINA */
+    #ticketImpresion {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: letter;
+        margin: 5mm;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #ticketImpresion, #ticketImpresion * {
+        visibility: visible;
+      }
+      #ticketImpresion {
+        display: block !important;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 400px;
+        padding: 15px 20px;
+        background: #ffffff !important;
+        color: #1e293b !important;
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        border: 1px solid #cbd5e1;
+        box-shadow: none;
+      }
+      .bank-header {
+        text-align: center;
+        border-bottom: 2px solid #0f172a;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+      }
+      .bank-header h2 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: 1px;
+      }
+      .bank-header p {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+      .transfer-badge {
+        background: #f1f5f9;
+        border-radius: 4px;
+        padding: 6px;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #059669;
+        margin-bottom: 8px;
+        border: 1px dashed #cbd5e1;
+      }
+      .transfer-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        font-size: 0.78rem;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .transfer-row span:first-child {
+        color: #64748b;
+        font-weight: 600;
+      }
+      .transfer-row span:last-child {
+        color: #0f172a;
+        font-weight: 700;
+      }
+      .transfer-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        margin-top: 6px;
+        border-top: 2px solid #0f172a;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      .bank-footer {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 0.65rem;
+        color: #94a3b8;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO ESTILO VIDEOJUEGO -->
+  <div id="intro-screen">
+    <div class="intro-logo-box">
+      <div class="intro-title">CALCUPRO</div>
+      <div class="intro-subtitle">Cargando Sistema Financiero...</div>
+      <div class="loading-bar-container">
+        <div class="loading-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="app-logo-wrapper">
+        <div class="app-logo">
+          <div class="logo-icon">
+            <div class="logo-block"></div>
+            <div class="logo-block"></div>
+            <div class="logo-block"></div>
+            <div class="logo-block"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h1>CalcuPro</h1>
+        <div class="subtitle-badge">Plataforma Avanzada de Cálculo, Costos y Márgenes Comerciales</div>
+      </div>
+    </header>
+
+    <main class="calculator-grid">
+      <!-- Formulario de Entrada -->
+      <section class="card form-section">
+        <h2>🏷️ Datos del Producto</h2>
+        
+        <div class="input-group">
+          <label for="nombreProducto">Nombre del Producto</label>
+          <input type="text" id="nombreProducto" placeholder="Ej. Artículo Profesional">
+        </div>
+
+        <div class="input-group">
+          <label for="costoProducto">Costo de Adquisición / Fabricación (L.)</label>
+          <input type="number" id="costoProducto" placeholder="Ej. 10.00" step="0.01" min="0">
+        </div>
+
+        <div class="input-group">
+          <label for="costosAdicionales">Costos Adicionales / Envíos (L.)</label>
+          <input type="number" id="costosAdicionales" placeholder="Ej. 2.50" step="0.01" min="0">
+        </div>
+
+        <div class="input-group">
+          <label for="margenGanancia">Margen de Ganancia Deseado (%)</label>
+          <input type="number" id="margenGanancia" placeholder="Ej. 40" step="1" min="0">
+        </div>
+
+        <div class="input-group">
+          <label for="impuesto">Impuesto de Venta / IVA (%)</label>
+          <input type="number" id="impuesto" placeholder="Ej. 15" step="1" min="0">
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="guardarProducto()">Guardar en Registro</button>
+          <button class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar</button>
+        </div>
+      </section>
+
+      <!-- Panel Desglose Financiero -->
+      <section class="card result-section">
+        <h2>📊 Desglose Financiero Actual</h2>
+
+        <div class="result-box primary">
+          <span>Precio de Venta Final (con Impuestos)</span>
+          <h3 id="resPrecioFinal">L. 0.00</h3>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-item">
+            <span>Costo Total Directo:</span>
+            <strong id="resCostoTotal">L. 0.00</strong>
+          </div>
+          <div class="result-item">
+            <span>Ganancia Neta por Unidad:</span>
+            <strong id="resGananciaNeta" class="text-success">L. 0.00</strong>
+          </div>
+          <div class="result-item">
+            <span>Subtotal (sin Impuesto):</span>
+            <strong id="resPrecioSubtotal">L. 0.00</strong>
+          </div>
+          <div class="result-item">
+            <span>Monto de Impuesto:</span>
+            <strong id="resMontoImpuesto">L. 0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial de Productos Guardados -->
+      <section class="history-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>📋 Registro de Productos Guardados</h2>
+          <button class="btn-action" onclick="vaciarHistorial()" style="background: rgba(248, 113, 113, 0.2);">🗑️ Vaciar Todo</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Costo Total</th>
+                <th>Margen</th>
+                <th>Precio Final</th>
+                <th>Ganancia Neta</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaHistorial">
+              <!-- Los registros se cargan aquí dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- COMPROBANTE OFICIAL PARA IMPRESIÓN -->
+  <div id="ticketImpresion">
+    <div class="bank-header">
+      <h2>CALCUPRO</h2>
+      <p>Comprobante Oficial de Cotización / Venta</p>
+    </div>
+    <div class="transfer-badge">
+      ✔ Documento Verificado y Autorizado
+    </div>
+    <div class="transfer-row">
+      <span>Fecha y Hora:</span>
+      <span id="ticketFecha"></span>
+    </div>
+    <div class="transfer-row">
+      <span>Código de Referencia:</span>
+      <span id="ticketId"></span>
+    </div>
+    <div class="transfer-row">
+      <span>Artículo / Producto:</span>
+      <span id="ticketNombre"></span>
+    </div>
+    <div class="transfer-row">
+      <span>Costo Base + Envíos:</span>
+      <span id="ticketCosto"></span>
+    </div>
+    <div class="transfer-row">
+      <span>Subtotal (Sin Impuesto):</span>
+      <span id="ticketSubtotal"></span>
+    </div>
+    <div class="transfer-row">
+      <span>Impuesto (ISV):</span>
+      <span id="ticketImpuesto"></span>
+    </div>
+    <div class="transfer-total">
+      <span>TOTAL A PAGAR:</span>
+      <span id="ticketTotal"></span>
+    </div>
+    <div class="bank-footer">
+      <p>Gracias por su preferencia. Documento válido como constancia comercial.</p>
+      <p>Plataforma CalcuPro - Gestión de Costos</p>
+    </div>
+  </div>
+
+  <script>
+    let historial = JSON.parse(localStorage.getItem('historialCalcuProGameIntro')) || [];
+
+    function calcularValores() {
+      const costoProducto = parseFloat(document.getElementById('costoProducto').value) || 0;
+      const costosAdicionales = parseFloat(document.getElementById('costosAdicionales').value) || 0;
+      const porcentajeMargen = parseFloat(document.getElementById('margenGanancia').value) || 0;
+      const porcentajeImpuesto = parseFloat(document.getElementById('impuesto').value) || 0;
+
+      const costoTotalDirecto = costoProducto + costosAdicionales;
+      const gananciaNeta = costoTotalDirecto * (porcentajeMargen / 100);
+      const precioSubtotal = costoTotalDirecto + gananciaNeta;
+      const montoImpuesto = precioSubtotal * (porcentajeImpuesto / 100);
+      const precioFinal = precioSubtotal + montoImpuesto;
+
+      document.getElementById('resPrecioFinal').textContent = `L. ${precioFinal.toFixed(2)}`;
+      document.getElementById('resCostoTotal').textContent = `L. ${costoTotalDirecto.toFixed(2)}`;
+      document.getElementById('resGananciaNeta').textContent = `L. ${gananciaNeta.toFixed(2)}`;
+      document.getElementById('resPrecioSubtotal').textContent = `L. ${precioSubtotal.toFixed(2)}`;
+      document.getElementById('resMontoImpuesto').textContent = `L. ${montoImpuesto.toFixed(2)}`;
+
+      return {
+        costoTotalDirecto,
+        gananciaNeta,
+        precioSubtotal,
+        montoImpuesto,
+        precioFinal
+      };
+    }
+
+    function guardarProducto() {
+      const nombre = document.getElementById('nombreProducto').value.trim() || "Producto Sin Nombre";
+      const res = calcularValores();
+
+      if (res.costoTotalDirecto <= 0) {
+        alert("Por favor ingresa un costo de producto válido antes de guardar.");
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        nombre,
+        costoTotal: res.costoTotalDirecto,
+        margen: document.getElementById('margenGanancia').value || 0,
+        precioFinal: res.precioFinal,
+        gananciaNeta: res.gananciaNeta,
+        subtotal: res.precioSubtotal,
+        impuestoMonto: res.montoImpuesto
+      };
+
+      historial.push(item);
+      localStorage.setItem('historialCalcuProGameIntro', JSON.stringify(historial));
+      renderizarHistorial();
+      limpiarFormulario();
+      alert("¡Producto guardado exitosamente en el registro!");
+    }
+
+    function renderizarHistorial() {
+      const tbody = document.getElementById('tablaHistorial');
+      tbody.innerHTML = '';
+
+      if (historial.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No hay productos registrados aún.</td></tr>`;
+        return;
+      }
+
+      historial.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.nombre}</strong></td>
+          <td>L. ${item.costoTotal.toFixed(2)}</td>
+          <td>${item.margen}%</td>
+          <td><strong>L. ${item.precioFinal.toFixed(2)}</strong></td>
+          <td class="text-success">+L. ${item.gananciaNeta.toFixed(2)}</td>
+          <td>
+            <button class="btn-print" onclick="imprimirFactura(${item.id})">🖨️ Imprimir</button>
+            <button class="btn-download" onclick="descargarDocumento(${item.id})">📄 Documento</button>
+            <button class="btn-action" onclick="eliminarItem(${item.id})">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function eliminarItem(id) {
+      historial = historial.filter(item => item.id !== id);
+      localStorage.setItem('historialCalcuProGameIntro', JSON.stringify(historial));
+      renderizarHistorial();
+    }
+
+    function vaciarHistorial() {
+      if (confirm("¿Estás segura de que deseas vaciar todo el registro?")) {
+        historial = [];
+        localStorage.removeItem('historialCalcuProGameIntro');
+        renderizarHistorial();
+      }
+    }
+
+    function imprimirFactura(id) {
+      const item = historial.find(p => p.id === id);
+      if (!item) return;
+
+      document.getElementById('ticketFecha').textContent = new Date().toLocaleString();
+      document.getElementById('ticketId').textContent = `TXN-${item.id}`;
+      document.getElementById('ticketNombre').textContent = item.nombre;
+      document.getElementById('ticketCosto').textContent = `L. ${item.costoTotal.toFixed(2)}`;
+      document.getElementById('ticketSubtotal').textContent = `L. ${item.subtotal.toFixed(2)}`;
+      document.getElementById('ticketImpuesto').textContent = `L. ${item.impuestoMonto.toFixed(2)}`;
+      document.getElementById('ticketTotal').textContent = `L. ${item.precioFinal.toFixed(2)}`;
+
+      window.print();
+    }
+
+    function descargarDocumento(id) {
+      const item = historial.find(p => p.id === id);
+      if (!item) return;
+
+      const contenidoDoc = `========================================
+       CALCUPRO - COMPROBANTE OFICIAL
+========================================
+Fecha y Hora: ${new Date().toLocaleString()}
+Código Ref: TXN-${item.id}
+----------------------------------------
+Artículo: ${item.nombre}
+Costo Base + Envíos: L. ${item.costoTotal.toFixed(2)}
+Margen Aplicado: ${item.margen}%
+Subtotal (Sin Impuesto): L. ${item.subtotal.toFixed(2)}
+Impuesto (ISV): L. ${item.impuestoMonto.toFixed(2)}
+----------------------------------------
+TOTAL A PAGAR: L. ${item.precioFinal.toFixed(2)}
+========================================
+Gracias por su preferencia.
+Documento generado por CalcuPro.`;
+
+      const blob = new Blob([contenidoDoc], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Comprobante_${item.nombre.replace(/\s+/g, '_')}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function limpiarFormulario() {
+      document.getElementById('nombreProducto').value = '';
+      document.getElementById('costoProducto').value = '';
+      document.getElementById('costosAdicionales').value = '';
+      document.getElementById('margenGanancia').value = '';
+      document.getElementById('impuesto').value = '';
+      calcularValores();
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calcularValores);
+    });
+
+    renderizarHistorial();
+  </script>
+</body>
+</html>
